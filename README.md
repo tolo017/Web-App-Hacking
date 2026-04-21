@@ -76,7 +76,7 @@ Complete compromise of the web server's operating system. Attacker can read file
 4. Configure the web server to not execute scripts in the upload directory.
 
 **Screenshot 2: Webshell executing `Remote Code Execution`**
-![Webshell RCE](link-to-webshell-rce.png)
+![Webshell RCE]
 
 ## 3. Lessons Learned
 - HTTP is a plaintext protocol. Intercepting it reveals all secrets.
