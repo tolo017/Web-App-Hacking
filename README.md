@@ -129,3 +129,52 @@ A single quote `'` is the master key. With `UNION SELECT` and `information_schem
 - [Error triggered by single quote]
 - [Union select returning database()]
 - [Dumped user credentials]
+
+
+# Foundry Logbook - Day 4
+
+**Date:** 2026-04-27
+**Focus:** Broken Access Control & Insecure Direct Object Reference (IDOR)
+
+## 1. Tools Used
+- OWASP Juice Shop (Docker)
+- Burp Suite (Proxy, Repeater, Intruder)
+- DVWA (IDOR module for demonstration)
+
+## 2. Juice Shop Installation
+- Installed Docker and pulled `bkimminich/juice-shop`.
+- Ran on port 3000, accessed via `http://localhost:3000`.
+- Found Score Board at `/#/score-board`.
+
+## 3. Exploitation Steps (Basket IDOR)
+### Manual Discovery
+- Registered a test user, added an item to the basket.
+- Intercepted `GET /rest/basket/1` in Burp.
+- Changed endpoint to `/rest/basket/2` in Repeater and observed another user's basket contents.
+- Confirmed missing ownership verification.
+
+### Automated Enumeration
+- Used Burp Intruder with payload positions on the basket ID.
+- Payloads: Numbers from 1 to 50.
+- Identified multiple unique basket responses by length.
+- Demonstrated ability to access all active baskets without authorization.
+
+## 4. Impact
+- Unauthorized access to private cart data (and potentially personal info if extended).
+- Loss of customer privacy, possible fraud if checkout process also flawed.
+- Typical impact: medium to critical depending on exposed data.
+
+## 5. Remediation
+- Always verify that the currently authenticated user is the owner of the requested object.
+- Use unpredictable object references (UUIDs instead of sequential IDs) and map them server-side.
+- Implement proper access control checks on all API endpoints.
+
+## 6. Key Takeaway
+- Changing a number in a URL is not hacking; it's what happens when developers assume user A won't guess user B's ID.
+- Automating the process with Burp Intruder scales the attack into a full data leak.
+
+**Screenshots:**
+- [Juice Shop homepage with Docker running]
+- [Burp Repeater showing basket 2 response]
+- [Burp Intruder attack results with length variations]
+- [DVWA IDOR showing user 2's profile]
