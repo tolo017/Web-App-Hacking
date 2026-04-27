@@ -36,6 +36,25 @@ A 3 week series of my journey in Web Application Hacking.
 - Manual installation teaches you about dependencies and file permissions.
 - You can connect to another instance.
 
+## Bonus Forbidden Technique: Chained IDOR to Financial Theft
+
+**Challenge:** Juice Shop "Place an order using another user's wallet"
+
+**Technique:**
+1. Enumerated baskets via IDOR to locate victim's basket (ID 3).
+2. Enumerated wallets via IDOR (`GET /rest/wallet/3`) to identify victim's wallet ID.
+3. Intercepted attacker's legitimate order placement request (`POST /api/Orders`) containing `basketId` and `walletId`.
+4. Substituted attacker's IDs with victim's basket and wallet IDs, while retaining attacker's authorization token.
+5. Sent the request; order was created, victim's wallet was charged, attacker's account received the order confirmation.
+
+**Impact:**
+- Unauthorized financial transactions.
+- Complete violation of user isolation.
+- Could be scripted to drain all user wallets.
+
+**Remediation:**
+- Server-side ownership validation for every object access (basket, wallet, order).
+- Never trust client-provided object IDs without checking against session user's ownership.
 
 
 
